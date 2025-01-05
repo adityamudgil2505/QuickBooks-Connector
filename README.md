@@ -33,3 +33,11 @@ To undo server code changes
 ```
 git add . && git stash && git stash drop
 ```
+
+Common Commands
+```
+docker ps
+docker stop <id>
+sudo systemctl stop nginx
+sudo lsof -i :80
+```
