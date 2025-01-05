@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import express from 'express';
 import OAuthClient from 'intuit-oauth';
-import mysql from 'mysql2/promise';
+import mysql from 'mysql2-promise';
 
 require('dotenv').config(); // Load environment variables from .env file
 
