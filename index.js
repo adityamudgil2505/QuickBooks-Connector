@@ -1,7 +1,8 @@
-const express = require('express');
-const OAuthClient = require('intuit-oauth');
-const mysql = require('mysql2-promise');
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
+import express from 'express';
+import OAuthClient from 'intuit-oauth';
+import mysql from 'mysql2/promise';
+
 require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
