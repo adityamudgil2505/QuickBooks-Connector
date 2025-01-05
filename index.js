@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import express from 'express';
 import OAuthClient from 'intuit-oauth';
-import mysql from 'mysql2-promise';
 import dotenv from 'dotenv';  // Import dotenv
 dotenv.config();              // Load environment variables from .env file
 
@@ -54,47 +53,63 @@ app.get('/callback', async (req, res) => {
 });
 
 // Step 3: Fetch Data from QuickBooks and Push to SQL
-app.get('/sync-customers', async (req, res) => {
-  try {
-    const companyId = oauthClient.getToken().realmId;
-    const accessToken = oauthClient.getToken().access_token;
+app.get('/get-customers', async (req, res) => {
+  // try {
+  //   const companyId = oauthClient.getToken().realmId;
+  //   const accessToken = oauthClient.getToken().access_token;
 
-    // Fetch Customers from QuickBooks
-    const response = await fetch(
-      `https://sandbox-quickbooks.api.intuit.com/v3/company/${companyId}/query?query=SELECT * FROM Customer`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Accept: 'application/json',
-        },
-      }
-    );
-    const data = await response.json();
-    const customers = data.QueryResponse.Customer || [];
+  //   // Fetch Customers from QuickBooks
+  //   const response = await fetch(
+  //     `https://sandbox-quickbooks.api.intuit.com/v3/company/${companyId}/query?query=SELECT * FROM Customer`,
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //         Accept: 'application/json',
+  //       },
+  //     }
+  //   );
+  //   const data = await response.json();
+  //   const customers = data.QueryResponse.Customer || [];
+  //   res.send(customers);
+  // } catch (error) {
+  //   console.error('Error syncing data:', error);
+  //   res.status(500).send('Failed to sync data!');
+  // }
+  const companyID = oauthClient.getToken().realmId;
 
-    // Connect to SQL database
-    const connection = await mysql.createConnection(dbConfig);
+  const url =
+    oauthClient.environment == 'sandbox'
+      ? OAuthClient.environment.sandbox
+      : OAuthClient.environment.production;
 
-    // Push data to SQL database
-    for (const customer of customers) {
-      await connection.execute(
-        'INSERT INTO customers (id, display_name, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE display_name = ?, email = ?',
-        [
-          customer.Id,
-          customer.DisplayName,
-          customer.PrimaryEmailAddr?.Address || null,
-          customer.DisplayName,
-          customer.PrimaryEmailAddr?.Address || null,
-        ]
-      );
-    }
+  oauthClient
+    .makeApiCall({ url: `${url}v3/company/${companyID}/query?query=SELECT * FROM Customer` })
+    .then(function (authResponse) {
+      console.log(`\n The response for API call is :${JSON.stringify(authResponse.json)}`);
+      res.send(authResponse.json);
+    })
+    .catch(function (e) {
+      console.error(e);
+    });
+});
 
-    await connection.end();
-    res.send('Data synced successfully!');
-  } catch (error) {
-    console.error('Error syncing data:', error);
-    res.status(500).send('Failed to sync data!');
-  }
+app.get('/get-company', function (req, res) {
+  const companyID = oauthClient.getToken().realmId;
+
+  const url =
+    oauthClient.environment == 'sandbox'
+      ? OAuthClient.environment.sandbox
+      : OAuthClient.environment.production;
+
+  oauthClient
+    .makeApiCall({ url: `${url}v3/company/${companyID}/companyinfo/${companyID}` })
+    .then(function (authResponse) {
+      console.log(`\n The response for API call is :${JSON.stringify(authResponse.json)}`);
+      res.send(authResponse.json);
+    })
+    .catch(function (e) {
+      console.error(e);
+    });
 });
 
 // Start the server

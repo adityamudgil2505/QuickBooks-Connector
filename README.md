@@ -28,3 +28,8 @@ To expose port on external server
 sudo ufw allow 80
 
 ```
+
+To undo server code changes
+```
+git add . && git stash && git stash drop
+```
