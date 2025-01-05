@@ -41,3 +41,37 @@ docker stop <id>
 sudo systemctl stop nginx
 sudo lsof -i :80
 ```
+
+
+### NGINX config to get certificate
+https://www.programonaut.com/setup-ssl-with-docker-nginx-and-lets-encrypt/
+https://www.youtube.com/watch?v=J9jKKeV1XVE
+
+```
+events {
+    worker_connections  1024;
+}
+
+http {
+    server_tokens off;
+    charset utf-8;
+
+    # always redirect to https
+    server {
+        listen 80 default_server;
+
+        server_name _;
+
+	location ~ /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+
+	location / {
+            proxy_pass http://app:3000/;
+        }
+	
+    }
+
+   
+}
+```

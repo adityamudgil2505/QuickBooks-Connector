@@ -54,29 +54,7 @@ app.get('/callback', async (req, res) => {
 
 // Step 3: Fetch Data from QuickBooks and Push to SQL
 app.get('/get-customers', async (req, res) => {
-  // try {
-  //   const companyId = oauthClient.getToken().realmId;
-  //   const accessToken = oauthClient.getToken().access_token;
-
-  //   // Fetch Customers from QuickBooks
-  //   const response = await fetch(
-  //     `https://sandbox-quickbooks.api.intuit.com/v3/company/${companyId}/query?query=SELECT * FROM Customer`,
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //         Accept: 'application/json',
-  //       },
-  //     }
-  //   );
-  //   const data = await response.json();
-  //   const customers = data.QueryResponse.Customer || [];
-  //   res.send(customers);
-  // } catch (error) {
-  //   console.error('Error syncing data:', error);
-  //   res.status(500).send('Failed to sync data!');
-  // }
   const companyID = oauthClient.getToken().realmId;
-
   const url =
     oauthClient.environment == 'sandbox'
       ? OAuthClient.environment.sandbox
@@ -84,6 +62,43 @@ app.get('/get-customers', async (req, res) => {
 
   oauthClient
     .makeApiCall({ url: `${url}v3/company/${companyID}/query?query=SELECT * FROM Customer` })
+    .then(function (authResponse) {
+      console.log(`\n The response for API call is :${JSON.stringify(authResponse.json)}`);
+      res.send(authResponse.json);
+    })
+    .catch(function (e) {
+      console.error(e);
+    });
+});
+
+// Step 3: Fetch Data from QuickBooks and Push to SQL
+app.get('/get-invoices', async (req, res) => {
+  const companyID = oauthClient.getToken().realmId;
+  const url =
+    oauthClient.environment == 'sandbox'
+      ? OAuthClient.environment.sandbox
+      : OAuthClient.environment.production;
+
+  oauthClient
+    .makeApiCall({ url: `${url}v3/company/${companyID}/query?query=SELECT * FROM Invoice` })
+    .then(function (authResponse) {
+      console.log(`\n The response for API call is :${JSON.stringify(authResponse.json)}`);
+      res.send(authResponse.json);
+    })
+    .catch(function (e) {
+      console.error(e);
+    });
+});
+
+app.get('/get-accounts', async (req, res) => {
+  const companyID = oauthClient.getToken().realmId;
+  const url =
+    oauthClient.environment == 'sandbox'
+      ? OAuthClient.environment.sandbox
+      : OAuthClient.environment.production;
+
+  oauthClient
+    .makeApiCall({ url: `${url}v3/company/${companyID}/query?query=SELECT * FROM Account` })
     .then(function (authResponse) {
       console.log(`\n The response for API call is :${JSON.stringify(authResponse.json)}`);
       res.send(authResponse.json);
