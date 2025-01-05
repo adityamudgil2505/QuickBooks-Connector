@@ -16,7 +16,7 @@ const quickbooksConfig = {
 };
 
 const oauthClient = new OAuthClient(quickbooksConfig);
-
+console.log("quickbooksConfig", quickbooksConfig);
 // SQL Configuration
 const dbConfig = {
   host: process.env.DB_HOST,
