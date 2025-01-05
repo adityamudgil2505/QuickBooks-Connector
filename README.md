@@ -22,3 +22,9 @@ docker-compose up --build
 # Access the application
 http://localhost:3000/auth
 ```
+
+To expose port on external server
+```
+sudo ufw allow 80
+
+```

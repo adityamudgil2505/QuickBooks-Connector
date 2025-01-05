@@ -25,6 +25,10 @@ const dbConfig = {
   database: process.env.DB_DATABASE,
 };
 
+app.get('/', (req, res)=>{
+  res.send("App is running.");
+})
+
 // Step 1: Authorization URL
 app.get('/auth', (req, res) => {
   const authUri = oauthClient.authorizeUri({
