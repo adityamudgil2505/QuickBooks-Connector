@@ -127,6 +127,26 @@ app.get('/get-company', function (req, res) {
     });
 });
 
+app.get('/get-data', function(req, res){
+  const table = req.query.table;
+  const companyID = oauthClient.getToken().realmId;
+
+  const url =
+    oauthClient.environment == 'sandbox'
+      ? OAuthClient.environment.sandbox
+      : OAuthClient.environment.production;
+
+  oauthClient
+    .makeApiCall({ url: `${url}v3/company/${companyID}/query?query=SELECT * FROM ${table}` })
+    .then(function (authResponse) {
+      console.log(`\n The response for API call is :${JSON.stringify(authResponse.json)}`);
+      res.send(authResponse.json);
+    })
+    .catch(function (e) {
+      console.error(e);
+    });
+})
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
